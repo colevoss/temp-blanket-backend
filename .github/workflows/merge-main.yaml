@@ -16,6 +16,11 @@ jobs:
     outputs:
       image-digest: ${{ steps.docker_build_outputs.digest }}
 
+    # Add "id-token" with the intended permissions.
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       -
         name: Checkout
