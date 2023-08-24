@@ -41,6 +41,9 @@ jobs:
           images: |
             ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}
           tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
             type=sha
 
       -
@@ -95,4 +98,4 @@ jobs:
       -
         name: Prepare Development
         run: |
-          make prepare-development
+          make prepare-deployment
