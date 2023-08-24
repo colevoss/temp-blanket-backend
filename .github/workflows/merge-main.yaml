@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+env:
+  TEMP_BLANKET_GCP_PROJECT_ID: ${{ secrets.TEMP_BLANKET_GCP_PROJECT_ID }}
+  TEMP_BLANKET_GCP_REGION: ${{ secrets.TEMP_BLANKET_GCP_REGION }}
 # concurency: deploy
 
 jobs:
@@ -14,7 +17,7 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     outputs:
-      image-digest: ${{ steps.docker_build_outputs.digest }}
+      image-digest: ${{ steps.docker-build.outputs.digest }}
 
     # Add "id-token" with the intended permissions.
     permissions:
@@ -66,3 +69,21 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    name: Deploy Service
+    runs-on: ubuntu-latest
+    needs: build-image
+
+    env:
+      SERVICE_IMAGE: ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}@${{ needs.build-image.outputs.image-digest }}
+
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+
+      -
+        name: Echo Service Image
+        run: |
+          echo $SERVICE_IMAGE
