@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
-CONFIG_DIR=$(pwd)/deploy/config/
+DEPLOY_DIR=$(pwd)/deploy
+CONFIG_DIR=$DEPLOY_DIR/config/
 
-envsubst < $CONFIG_DIR/env.tfvars.template > $CONFIG_DIR/env.auto.tfvars
+envsubst < $CONFIG_DIR/env.tfvars.template > $DEPLOY_DIR/env.auto.tfvars

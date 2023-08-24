@@ -2,15 +2,18 @@ run:
 	go run "$(CURDIR)/cmd/tempblanket/main.go"
 
 docker-build:
-	docker build -t colevoss/temp-blanket-backend .
+	"$(CURDIR)/scripts/docker-build.sh"
+# docker build -t colevoss/temp-blanket-backend .
 
 docker-run:
-	docker run \
-		-it \
-		--rm \
-		-p 8080:8080 \
-		--env SYNOPTIC_API_TOKEN=$(SYNOPTIC_API_TOKEN) \
-		colevoss/temp-blanket-backend
+	"$(CURDIR)/scripts/docker-run.sh"
+
+# docker run \
+# 	-it \
+# 	--rm \
+# 	-p 8080:8080 \
+# 	--env SYNOPTIC_API_TOKEN=$(SYNOPTIC_API_TOKEN) \
+# 	colevoss/temp-blanket-backend
 
 prepare-deployment:
 	"$(CURDIR)/scripts/create-env-file.sh"
