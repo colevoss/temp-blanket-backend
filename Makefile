@@ -11,3 +11,6 @@ docker-run:
 		-p 8080:8080 \
 		--env SYNOPTIC_API_TOKEN=$(SYNOPTIC_API_TOKEN) \
 		colevoss/temp-blanket-backend
+
+make-env-file:
+	"$(CURDIR)/scripts/create-env-file.sh"

@@ -7,7 +7,6 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-# RUN go build -v -o /usr/local/bin/app /usr/src/app/cmd/tempblanket/main.go
 RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /usr/local/bin/app /usr/src/app/cmd/tempblanket/main.go
 
 FROM alpine
