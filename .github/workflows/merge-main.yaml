@@ -40,7 +40,7 @@ jobs:
         with:
           images: |
             ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}
-          tags:
+          tags: |
             type=sha
 
       -
