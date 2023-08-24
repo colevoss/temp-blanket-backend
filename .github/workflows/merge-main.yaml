@@ -88,3 +88,11 @@ jobs:
         name: Echo Service Image
         run: |
           echo $SERVICE_IMAGE
+
+      -
+        uses: hashicorp/setup-terraform@v2
+
+      -
+        name: Prepare Development
+        run: |
+          make prepare-development
