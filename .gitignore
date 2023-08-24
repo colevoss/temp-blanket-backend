@@ -13,3 +13,5 @@ build
 terraform.tfvars
 *auto.tfvars
 *gcloud-auth.json
+
+.dev

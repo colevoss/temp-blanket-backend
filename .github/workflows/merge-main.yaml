@@ -1,6 +1,8 @@
 name: Merge Main
 
 on:
+  pull_request:
+    types: [opened, synchronize]
   push:
     branches:
       - main
@@ -25,3 +27,28 @@ jobs:
 
       -
         name: Docker Meta
+        id: docker-meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}
+          tags:
+            type=sha
+
+      -
+        id: gcp-auth
+        name: Login to Google Artifact Registry
+        uses: google-github-actions/auth@v0
+        with:
+          token_format: access_token
+          workload_identity_provider: ${{ secrets.GCP_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_OPS_SERVICE_ACCOUNT }}
+
+      -
+        name: Docker Login
+        uses: docker/login-action@v2
+        with:
+          registry: us-central1-docker.pkg.dev
+          username: oauth2accesstoken
+          password: ${{ steps.gcp-auth.outputs.access_token }}
+
