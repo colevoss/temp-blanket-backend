@@ -10,6 +10,7 @@ on:
 env:
   TEMP_BLANKET_GCP_PROJECT_ID: ${{ secrets.TEMP_BLANKET_GCP_PROJECT_ID }}
   TEMP_BLANKET_GCP_REGION: ${{ secrets.TEMP_BLANKET_GCP_REGION }}
+  SYNOPTIC_API_TOKEN: ${{ secrets.SYNOPTIC_API_TOKEN }}
 # concurency: deploy
 
 jobs:
@@ -80,7 +81,7 @@ jobs:
     needs: build-image
 
     env:
-      SERVICE_IMAGE: ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}@${{ needs.build-image.outputs.image-digest }}
+      DOCKER_IMAGE_DIGEST: ${{ secrets.DOCKER_REPO }}/${{ secrets.IMAGE_NAME }}@${{ needs.build-image.outputs.image-digest }}
 
     steps:
       -
