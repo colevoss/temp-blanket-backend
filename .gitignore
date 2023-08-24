@@ -3,4 +3,13 @@
 
 build
 
+# Env
+
 .env
+
+# Ops
+
+.terraform
+terraform.tfvars
+*auto.tfvars
+*gcloud-auth.json

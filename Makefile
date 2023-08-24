@@ -12,5 +12,15 @@ docker-run:
 		--env SYNOPTIC_API_TOKEN=$(SYNOPTIC_API_TOKEN) \
 		colevoss/temp-blanket-backend
 
-make-env-file:
+prepare-deployment:
 	"$(CURDIR)/scripts/create-env-file.sh"
+
+terraform-init:
+	cd ./deploy && \
+		terraform init \
+			-backend-config=./config/gcs.tfbackend
+
+terraform-plan:
+	cd ./deploy && \
+		terraform plan \
+			-var-file=./config/input.tfvars
