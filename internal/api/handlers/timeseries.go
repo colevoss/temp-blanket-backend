@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/colevoss/temperature-blanket-backend/internal/integrations/synoptic"
+	"github.com/colevoss/temperature-blanket-backend/internal/logger"
 	"github.com/colevoss/temperature-blanket-backend/internal/repositories/weather"
 	"github.com/gin-gonic/gin"
 )
@@ -42,6 +43,11 @@ func (tsh *TimeSeriesHandlers) GetSummary(c *gin.Context) {
 	dateQuery := c.Query("date")
 	// parsedDate := tsh.parseDateQuery(dateQuery)
 	parsedDate := tsh.parseIsoDateQuery(dateQuery)
+
+	logger.Req(c).Infow(
+		"Getting summary for date",
+		"date", parsedDate,
+	)
 
 	if err := tsh.validateDate(parsedDate); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

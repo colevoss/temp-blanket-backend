@@ -4,12 +4,24 @@ import (
 	"github.com/colevoss/temperature-blanket-backend/internal/api"
 	"github.com/colevoss/temperature-blanket-backend/internal/api/handlers"
 	"github.com/colevoss/temperature-blanket-backend/internal/api/routes"
+	"github.com/colevoss/temperature-blanket-backend/internal/config"
+	"github.com/colevoss/temperature-blanket-backend/internal/logger"
 	"github.com/colevoss/temperature-blanket-backend/internal/repositories/weather"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	api := api.NewApi()
+	cfg := config.NewConfig()
+	cfg.ParseFlags()
+
+	if cfg.IsProd() {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	logger.InitLogger(cfg)
+	defer logger.CloseLogger()
+
+	api := api.NewApi(cfg)
 	api.Init()
 
 	weatherRepo := weather.NewSynopticWeatherRepo()

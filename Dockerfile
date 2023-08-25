@@ -12,6 +12,7 @@ RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /usr/local/bin/app /usr
 FROM alpine
 
 ENV PORT=8080
+ENV ENV=production
 
 RUN apk add --no-cache tzdata
 
