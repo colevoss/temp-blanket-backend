@@ -70,12 +70,12 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          # push: ${{ github.event_name != 'pull_request' }}
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
 
   deploy:
+    if: ${{ github.event_name != 'pull_request' }}
     name: Deploy Service
     runs-on: ubuntu-latest
     needs: build-image
