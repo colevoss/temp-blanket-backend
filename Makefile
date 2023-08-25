@@ -26,4 +26,5 @@ terraform-init:
 terraform-plan:
 	cd ./deploy && \
 		terraform plan \
+			-no-color \
 			-var-file=./config/input.tfvars
