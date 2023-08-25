@@ -127,3 +127,9 @@ jobs:
         name: Terraform Plan
         run: |
           make terraform-plan
+
+      -
+        name: Terraform Apply
+        run: |
+          make terraform-apply
+

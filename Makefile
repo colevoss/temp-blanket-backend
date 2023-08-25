@@ -28,3 +28,9 @@ terraform-plan:
 		terraform plan \
 			-no-color \
 			-var-file=./config/input.tfvars
+
+terraform-apply:
+	cd ./deploy && \
+		terraform apply \
+			-auto-approve \
+			-var-file=./config/input.tfvars
