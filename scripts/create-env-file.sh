@@ -1,3 +1,8 @@
 #!/usr/bin/env bash
 
-TEST=howdyvar envsubst < test.txt > new.test.txt
+DEPLOY_DIR=$(pwd)/deploy
+CONFIG_DIR=$DEPLOY_DIR/config/
+
+envsubst < $CONFIG_DIR/env.tfvars.template > $DEPLOY_DIR/env.auto.tfvars
+
+cat $DEPLOY_DIR/env.auto.tfvars

@@ -11,13 +11,15 @@ RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /usr/local/bin/app /usr
 
 FROM alpine
 
+ENV PORT=8080
+
 RUN apk add --no-cache tzdata
 
 WORKDIR /
 
 COPY --from=builder /usr/local/bin/app /bin/app
 
-EXPOSE 8080
+# EXPOSE 8080
 
 # USER nonroot:nonroot
 
