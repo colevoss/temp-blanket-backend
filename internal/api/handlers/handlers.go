@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/colevoss/temperature-blanket-backend/internal/api"
-	"github.com/colevoss/temperature-blanket-backend/internal/repositories/weather"
+	"github.com/colevoss/temperature-blanket-backend/internal/repositories"
 )
 
 type Handlers struct {
@@ -10,9 +10,9 @@ type Handlers struct {
 	TimeSeries *TimeSeriesHandlers
 }
 
-func NewHandlers(api *api.API, weatherRepo weather.WeatherRepository) *Handlers {
+func NewHandlers(api *api.API, repos *repositories.Repositories) *Handlers {
 	return &Handlers{
 		Ping:       NewPingHandlers(),
-		TimeSeries: NewTimeSeriesHandlers(weatherRepo),
+		TimeSeries: NewTimeSeriesHandlers(repos),
 	}
 }

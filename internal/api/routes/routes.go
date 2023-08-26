@@ -3,17 +3,15 @@ package routes
 import (
 	"github.com/colevoss/temperature-blanket-backend/internal/api"
 	"github.com/colevoss/temperature-blanket-backend/internal/api/handlers"
+	"github.com/go-chi/chi/v5"
 )
 
 func RegisterRoutes(api *api.API, handlers *handlers.Handlers) {
-	pingRoute := api.App.Group("/ping")
-	{
-		pingRoute.GET("", handlers.Ping.Ping)
-	}
+	api.App.Route("/ping", func(r chi.Router) {
+		r.Get("/", handlers.Ping.Ping)
+	})
 
-	timeSeriesRoute := api.App.Group("/timeseries")
-	{
-		timeSeriesRoute.GET("", handlers.TimeSeries.GetTimeSeries)
-		timeSeriesRoute.GET("/summary", handlers.TimeSeries.GetSummary)
-	}
+	api.App.Route("/weather", func(r chi.Router) {
+		r.Get("/summary", handlers.TimeSeries.GetSummary)
+	})
 }
