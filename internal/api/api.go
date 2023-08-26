@@ -9,6 +9,7 @@ import (
 	"github.com/colevoss/temperature-blanket-backend/internal/log"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/google/uuid"
 )
 
@@ -33,6 +34,8 @@ func (a *API) Run() {
 func (a *API) Init() {
 	a.App.Use(middleware.Logger)
 	a.App.Use(requestIdMiddleware)
+
+	a.App.Use(cors.Handler(cors.Options{}))
 }
 
 func requestIdMiddleware(next http.Handler) http.Handler {
