@@ -1,14 +1,15 @@
 package synoptic
 
 import (
+	"context"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
 
+	"github.com/colevoss/temperature-blanket-backend/internal/log"
 	"github.com/colevoss/temperature-blanket-backend/internal/util"
 )
 
@@ -22,8 +23,8 @@ func NewSynopticApi() *SynopticApi {
 	return &SynopticApi{}
 }
 
-func (s *SynopticApi) GetTimeSeriesTemperatureData(date time.Time) (*SynopticTimeSeriesResponse, error) {
-	url, err := s.buildAPIUrl(date)
+func (s *SynopticApi) GetTimeSeriesTemperatureData(ctx context.Context, date time.Time) (*SynopticTimeSeriesResponse, error) {
+	url, err := s.buildAPIUrl(ctx, date)
 
 	if err != nil {
 		return nil, err
@@ -32,14 +33,27 @@ func (s *SynopticApi) GetTimeSeriesTemperatureData(date time.Time) (*SynopticTim
 	req, err := http.NewRequest(http.MethodGet, url.String(), nil)
 
 	if err != nil {
-		log.Printf("Could not create request %s", err)
+		log.C(ctx).Warnw(
+			"Could not create request",
+			"error", err,
+		)
+
 		return nil, err
 	}
+
+	log.C(ctx).Debugw(
+		"Making request to Synoptic",
+		"date", date,
+	)
 
 	res, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		log.Printf("Error making request: %s", err)
+		log.C(ctx).Warnw(
+			"Error making request to Synoptic",
+			"error", err,
+		)
+
 		return nil, err
 	}
 
@@ -48,7 +62,7 @@ func (s *SynopticApi) GetTimeSeriesTemperatureData(date time.Time) (*SynopticTim
 	resBody, err := io.ReadAll(res.Body)
 
 	if err != nil {
-		log.Printf("Error reading body %s", err)
+		log.Logger.Errorf("Error reading body %s", err)
 		return nil, err
 	}
 
@@ -56,11 +70,9 @@ func (s *SynopticApi) GetTimeSeriesTemperatureData(date time.Time) (*SynopticTim
 	err = json.Unmarshal(resBody, &timeseriesResponse)
 
 	if err != nil {
-		log.Printf("Could not parse response body %s", err)
+		log.C(ctx).Error(err.Error())
 		return nil, err
 	}
-
-	log.Printf("TSR %v", timeseriesResponse.Summary.ResponseCode)
 
 	if timeseriesResponse.Summary.ResponseCode != 1 {
 		return nil, SynopticApiError{
@@ -68,14 +80,20 @@ func (s *SynopticApi) GetTimeSeriesTemperatureData(date time.Time) (*SynopticTim
 		}
 	}
 
+	log.C(ctx).Infow(
+		"Synoptic request successfull",
+		"date", date,
+	)
+
 	return &timeseriesResponse, nil
 }
 
-func (s *SynopticApi) buildAPIUrl(date time.Time) (*url.URL, error) {
+func (s *SynopticApi) buildAPIUrl(ctx context.Context, date time.Time) (*url.URL, error) {
 	url, err := url.Parse(SYNOPTIC_API_URL)
 
 	if err != nil {
-		log.Printf("Could not parse url %s", err)
+		log.Raw().Errorf("Could not parse url %s", err)
+		log.Logger.Error()
 		return nil, err
 	}
 
@@ -88,28 +106,28 @@ func (s *SynopticApi) buildAPIUrl(date time.Time) (*url.URL, error) {
 	start, err := util.GetStartOfDay(date)
 
 	if err != nil {
-		log.Printf("Fuck")
 		return nil, err
 	}
 
 	end, err := util.GetEndOfDay(date)
 
 	if err != nil {
-		log.Printf("Fuck")
 		return nil, err
 	}
 
 	startStr := util.FormatDate(start.UTC())
 	endStr := util.FormatDate(end.UTC())
 
-	log.Printf("Making request for %v - %v", startStr, endStr)
+	log.C(ctx).Infow(
+		"Building Synoptic request for dates",
+		"start", startStr,
+		"end", endStr,
+	)
 
 	query.Set("start", startStr)
 	query.Set("end", endStr)
 
 	url.RawQuery = query.Encode()
-
-	log.Printf("Making request to url: %s", url.String())
 
 	return url, nil
 }

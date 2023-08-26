@@ -5,35 +5,27 @@ import (
 	"github.com/colevoss/temperature-blanket-backend/internal/api/handlers"
 	"github.com/colevoss/temperature-blanket-backend/internal/api/routes"
 	"github.com/colevoss/temperature-blanket-backend/internal/config"
-	"github.com/colevoss/temperature-blanket-backend/internal/logger"
-	"github.com/colevoss/temperature-blanket-backend/internal/repositories/weather"
-	"github.com/gin-gonic/gin"
+	"github.com/colevoss/temperature-blanket-backend/internal/log"
+	"github.com/colevoss/temperature-blanket-backend/internal/repositories"
 )
 
 func main() {
 	cfg := config.NewConfig()
 	cfg.ParseFlags()
 
-	if cfg.IsProd() {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
-	logger.InitLogger(cfg)
-	defer logger.CloseLogger()
+	log.InitLogger(cfg)
+	defer log.CloseLogger()
 
 	api := api.NewApi(cfg)
 	api.Init()
 
-	weatherRepo := weather.NewSynopticWeatherRepo()
+	repos := repositories.NewRepositories(cfg)
+
 	// weatherRepo := weather.NewMockWeatherRepo()
 
-	handlers := handlers.NewHandlers(api, weatherRepo)
+	handlers := handlers.NewHandlers(api, repos)
 
 	routes.RegisterRoutes(api, handlers)
 
 	api.Run()
-}
-
-func init() {
-	gin.SetMode(gin.DebugMode)
 }

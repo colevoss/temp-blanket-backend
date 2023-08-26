@@ -1,6 +1,7 @@
 package weather
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -12,8 +13,8 @@ type SynopticWeatherRepo struct {
 	api *synoptic.SynopticApi
 }
 
-func (swr *SynopticWeatherRepo) GetSummary(time time.Time) (*DailySummary, error) {
-	timeSeries, err := swr.api.GetTimeSeriesTemperatureData(time)
+func (swr *SynopticWeatherRepo) GetSummary(ctx context.Context, time time.Time) (*DailySummary, error) {
+	timeSeries, err := swr.api.GetTimeSeriesTemperatureData(ctx, time)
 
 	if err != nil {
 		log.Printf("Error %v", err)

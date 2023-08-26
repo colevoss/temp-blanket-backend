@@ -1,6 +1,9 @@
 package weather
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type DailySummary struct {
 	Date    time.Time `json:"date"`
@@ -10,5 +13,5 @@ type DailySummary struct {
 }
 
 type WeatherRepository interface {
-	GetSummary(date time.Time) (*DailySummary, error)
+	GetSummary(context context.Context, date time.Time) (*DailySummary, error)
 }
