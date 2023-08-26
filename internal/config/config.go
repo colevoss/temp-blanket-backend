@@ -16,7 +16,7 @@ func NewConfig() *Config {
 
 func (cfg *Config) ParseFlags() error {
 	flag.StringVar(&cfg.Env, "env", cfg.GetOsVar("ENV", "development"), "Sets environment variable")
-	flag.StringVar(&cfg.Port, "port", cfg.GetOsVar("PORT", "3000"), "Sets environment variable")
+	flag.StringVar(&cfg.Port, "port", cfg.GetOsVar("PORT", "8080"), "Sets environment variable")
 
 	return nil
 }
