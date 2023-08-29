@@ -32,6 +32,8 @@ func GetStartOfDay(date time.Time) (time.Time, error) {
 		return date, err
 	}
 
+	date = date.In(tz)
+
 	return time.Date(
 		date.Year(),
 		date.Month(),
@@ -48,6 +50,8 @@ func GetEndOfDay(date time.Time) (time.Time, error) {
 		log.Fatalf("Cannot load timezone %s", err)
 		return date, err
 	}
+
+	date = date.In(tz)
 
 	return time.Date(
 		date.Year(),
