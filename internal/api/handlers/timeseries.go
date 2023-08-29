@@ -23,6 +23,7 @@ func (tsh *TimeSeriesHandlers) GetSummary(w http.ResponseWriter, r *http.Request
 
 	log.C(ctx).Infow(
 		"Summary date request",
+		"dateQuery", dateQuery,
 		"date", parsedDate,
 	)
 
