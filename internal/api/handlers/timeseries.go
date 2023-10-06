@@ -18,6 +18,12 @@ type TimeSeriesHandlers struct {
 func (tsh *TimeSeriesHandlers) GetSummary(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	dateQuery := r.URL.Query().Get("date")
+	station := r.URL.Query().Get("station")
+
+	if station == "" {
+		response.Error(w, r, response.BadRequest("station required", nil, nil))
+		return
+	}
 
 	parsedDate := tsh.parseIsoDateQuery(dateQuery)
 
@@ -32,7 +38,7 @@ func (tsh *TimeSeriesHandlers) GetSummary(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	summary, err := tsh.Repos.Weather.GetSummary(ctx, parsedDate)
+	summary, err := tsh.Repos.Weather.GetSummary(ctx, parsedDate, station)
 
 	if err != nil {
 		response.Error(w, r, err)
@@ -54,9 +60,10 @@ func (tsh *TimeSeriesHandlers) parseIsoDateQuery(dateQuery string) time.Time {
 
 func (tsh *TimeSeriesHandlers) validateDate(date time.Time) error {
 	now := time.Now()
-	yearAgo := time.Now().AddDate(-1, 0, 0)
+	// yearAgo := time.Now().AddDate(-1, 0, 0)
 
-	if date.After(now) || date.Before(yearAgo) {
+	// if date.After(now) || date.Before(yearAgo) {
+	if date.After(now) {
 		return response.BadRequest("Invalid date", response.Map{
 			"date": date,
 		}, nil)
