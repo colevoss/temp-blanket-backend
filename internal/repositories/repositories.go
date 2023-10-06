@@ -11,6 +11,7 @@ type Repositories struct {
 
 func NewRepositories(cfg *config.Config) *Repositories {
 	return &Repositories{
-		Weather: weather.NewSynopticWeatherRepo(),
+		// Weather: weather.NewSynopticWeatherRepo(),
+		Weather: weather.NewIEMWeatherRepo(),
 	}
 }

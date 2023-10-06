@@ -13,5 +13,5 @@ type DailySummary struct {
 }
 
 type WeatherRepository interface {
-	GetSummary(context context.Context, date time.Time) (*DailySummary, error)
+	GetSummary(context context.Context, date time.Time, stationId string) (*DailySummary, error)
 }
