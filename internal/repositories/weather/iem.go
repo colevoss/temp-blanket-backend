@@ -20,7 +20,7 @@ func (r *IEMWeatherRepo) checkError(err error) error {
 	var notFoundError iem.IEMNotFoundError
 
 	if errors.As(err, &notFoundError) {
-		return response.NewError(notFoundError.Detail, 404, nil, notFoundError)
+		return response.NewError(notFoundError.Detail, notFoundError.Code, nil, notFoundError)
 	} else {
 		return err
 	}
