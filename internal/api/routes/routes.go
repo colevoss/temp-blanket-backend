@@ -14,4 +14,9 @@ func RegisterRoutes(api *api.API, handlers *handlers.Handlers) {
 	api.App.Route("/weather", func(r chi.Router) {
 		r.Get("/summary", handlers.TimeSeries.GetSummary)
 	})
+
+	api.App.Route("/networks", func(r chi.Router) {
+		r.Get("/", handlers.Networks.GetNetworks)
+		r.Get("/{networkId}/stations", handlers.Networks.GetStations)
+	})
 }

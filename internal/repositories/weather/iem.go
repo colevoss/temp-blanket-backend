@@ -26,8 +26,110 @@ func (r *IEMWeatherRepo) checkError(err error) error {
 	}
 }
 
+func (r *IEMWeatherRepo) GetNetworks(ctx context.Context) ([]*iem.Network, error) {
+	log.C(ctx).Infow("Requesting networks from IEM")
+
+	networks, err := r.client.Networks().GetNetworks(ctx)
+
+	return networks, err
+}
+
+func (r *IEMWeatherRepo) GetStations(ctx context.Context, networkId string) ([]*iem.Station, error) {
+	log.C(ctx).Infow(
+		"Requesting stations from IEM for network",
+		"networkId", networkId,
+	)
+
+	stations, err := r.client.Stations().GetStations(ctx, networkId)
+
+	return stations, err
+}
+
+func (r *IEMWeatherRepo) Summary(data []*iem.IEMWeatherData, date time.Time) (*DailySummary, error) {
+	low := 0.0
+	high := 0.0
+
+	for i, d := range data {
+		if i == 0 {
+			high = d.TemperatureF
+			low = d.TemperatureF
+		}
+
+		if d.TemperatureF > high {
+			high = d.TemperatureF
+		}
+
+		if d.TemperatureF < low {
+			low = d.TemperatureF
+		}
+	}
+
+	average := (high + low) / 2
+
+	return &DailySummary{
+		Low:     low,
+		High:    high,
+		Average: average,
+		Date:    date,
+	}, nil
+}
+
+func (r *IEMWeatherRepo) GetWeatherData(ctx context.Context, date time.Time, stationId string) ([]*iem.IEMWeatherData, error) {
+	station, err := r.GetStation(ctx, stationId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	tz, err := time.LoadLocation(station.Timezone)
+
+	if err != nil {
+		return nil, err
+	}
+
+	q := iem.NewWeatherDataQuery()
+	localDate := date.In(tz)
+
+	q.Data(iem.TempF)
+	q.Stations(stationId)
+	q.Start(localDate)
+	q.End(localDate)
+	q.ReportType(3)
+	q.Timezone(station.Timezone)
+
+	log.C(ctx).Infow(
+		"Requesting IEM Weather data",
+		"station", "LNK",
+		"date", date,
+		"station", stationId,
+		"timezone", tz,
+		"localDate", localDate,
+	)
+
+	data, err := r.client.Weather().Get(ctx, q)
+
+	if err != nil {
+		log.C(ctx).Errorw(
+			"Error requesting weather from IEM",
+			"error", err,
+		)
+		return nil, err
+	}
+
+	log.C(ctx).Infow(
+		"IEM weather request successful",
+		"count", len(data),
+	)
+
+	return data, nil
+}
+
 func (r *IEMWeatherRepo) GetSummary(ctx context.Context, date time.Time, stationId string) (*DailySummary, error) {
-	station, err := r.getStation(ctx, stationId)
+	station, err := r.GetStation(ctx, stationId)
 
 	if err != nil {
 		return nil, err
@@ -105,7 +207,7 @@ func (r *IEMWeatherRepo) GetSummary(ctx context.Context, date time.Time, station
 	}, nil
 }
 
-func (r *IEMWeatherRepo) getStation(ctx context.Context, stationId string) (*iem.Station, error) {
+func (r *IEMWeatherRepo) GetStation(ctx context.Context, stationId string) (*iem.Station, error) {
 	cachedStation, ok := r.cache.GetAndRefresh(stationId)
 
 	if ok {

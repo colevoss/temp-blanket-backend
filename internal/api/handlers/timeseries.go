@@ -18,10 +18,17 @@ type TimeSeriesHandlers struct {
 func (tsh *TimeSeriesHandlers) GetSummary(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	dateQuery := r.URL.Query().Get("date")
-	station := r.URL.Query().Get("station")
+	stationId := r.URL.Query().Get("station")
 
-	if station == "" {
+	if stationId == "" {
 		response.Error(w, r, response.BadRequest("station required", nil, nil))
+		return
+	}
+
+	station, err := tsh.Repos.Weather.GetStation(ctx, stationId)
+
+	if err != nil {
+		response.Error(w, r, response.NotFound("Station not found", nil, err))
 		return
 	}
 
@@ -38,14 +45,27 @@ func (tsh *TimeSeriesHandlers) GetSummary(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	summary, err := tsh.Repos.Weather.GetSummary(ctx, parsedDate, station)
+	data, err := tsh.Repos.Weather.GetWeatherData(ctx, parsedDate, stationId)
 
 	if err != nil {
 		response.Error(w, r, err)
 		return
 	}
 
-	response.Ok(w, r, summary)
+	// summary, err := tsh.Repos.Weather.GetSummary(ctx, parsedDate, stationId)
+	summary, err := tsh.Repos.Weather.Summary(data, parsedDate)
+
+	if err != nil {
+		response.Error(w, r, err)
+		return
+	}
+
+	// response.Ok(w, r, summary)
+	response.Ok(w, r, map[string]interface{}{
+		"summary": summary,
+		"station": station,
+		"data":    data,
+	})
 }
 
 func (tsh *TimeSeriesHandlers) parseIsoDateQuery(dateQuery string) time.Time {
