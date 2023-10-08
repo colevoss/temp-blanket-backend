@@ -24,3 +24,7 @@ func NewError(message string, code int, data interface{}, err error) error {
 func BadRequest(message string, data interface{}, err error) error {
 	return NewError(message, http.StatusBadRequest, data, err)
 }
+
+func NotFound(msg string, data interface{}, err error) error {
+	return NewError(msg, http.StatusNotFound, data, err)
+}
